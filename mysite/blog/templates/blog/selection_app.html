@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- 부가적인 테마 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>-->
+    <script type="text/javascript">
+        function select_app() {
+            var sample = document.getElementsByName('app');
+            for(var i=0; i<sample.length;i++){
+                if(sample[i].checked == true){
+                    location.href="{% url 'index' %}?app_name="+sample[i].value+"/";
+                }
+
+            }
+        }
+    </script>
+
+    <title>Select your app - HTTP Archive for Mobile</title>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <h2>Select Application</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th width="48">Check</th>
+            <th width="466">Application</th>
+            <th width="466">Package Name</th>
+            <th><button class="btn btn-lg btn-default" onclick="onclick_select()">Select</button></th>
+            <script>
+                function onclick_select(){
+                    document.getElementById("btn_select").click();
+                }
+            </script>
+
+        </tr>
+        </thead>
+    </table>
+</nav>
+<form action="/index/name/" method="post" style="margin-top:100px">
+    {% csrf_token %}
+
+    <table class="table">
+        <tbody>
+        {% for item in app_list %}
+        <tr>
+            <td width="42" align="center"><input type="radio" name="app" value="{{item.0}}"/></td>
+            <td width="400"><img src="{{item.2}}" width="42" height="42"> {{item.0}}</td>
+            <td width="400">{{item.1}}</td>
+        </tr>
+        {% endfor %}
+        <input id="btn_select" type="submit" value="Select"  class="btn btn-lg btn-default">
+        </tbody>
+    </table>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,546 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--<link rel="icon" href="../../favicon.ico">-->
+
+    <title>HTTP Archive for Mobile</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{% static 'assets/css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]>
+    <script src="{% static 'assets/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
+    <script src="{% static 'assets/js/ie-emulation-modes-warning.js' %}"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart","line"]});
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawChart2);
+      google.charts.setOnLoadCallback(drawChart3);
+      google.charts.setOnLoadCallback(drawChart4);
+      google.charts.setOnLoadCallback(drawChart5);
+      google.charts.setOnLoadCallback(drawChart6);
+      google.charts.setOnLoadCallback(drawChart7);
+      google.charts.setOnLoadCallback(drawChart8);
+      google.charts.setOnLoadCallback(drawChart9);
+      google.charts.setOnLoadCallback(drawChart10);
+      google.charts.setOnLoadCallback(drawChart11);
+      google.charts.setOnLoadCallback(drawChart12);
+
+      function drawChart() {
+        {% autoescape off %}
+        var data = google.visualization.arrayToDataTable({{averageBytesPerPageByContentTypeData}});
+        {% endautoescape %}
+        var options = {
+          title: 'Average Bytes per Page by Content Type',
+          pieHole: 0.4,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('img1'));
+        chart.draw(data, options);
+      }
+
+      function drawChart2() {
+        {% autoescape off %}
+        var data = google.visualization.arrayToDataTable({{averageIndividualResponseSize}});
+        {% endautoescape %}
+
+        var view = new google.visualization.DataView(data);
+        var options = {title: "Average Individual Response Size", width: 600, height: 400, bar: {groupWidth: "95%"}, legend: { position: "none" }, };
+        var chart = new google.visualization.BarChart(document.getElementById("img2"));
+        chart.draw(view, options);
+        }
+
+      function drawChart3() {
+        {% autoescape off %}
+        var data = google.visualization.arrayToDataTable({{imageRequestsByFormatData}});
+        {% endautoescape %}
+
+        var options = {
+          title: 'Image Requests by Format',
+          pieHole: 0.4,
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('img3'));
+        chart.draw(data, options);
+      }
+
+      function drawChart4() {
+        {% autoescape off %}
+        var data = google.visualization.arrayToDataTable({{cacheLifetimeData}});
+        {% endautoescape %}
+
+        var view = new google.visualization.DataView(data);
+        var options = {title: "Cache Life Time",width: 800, height: 400, bar: {groupWidth: "80%"}, legend: { position: "none" }, };
+        var chart = new google.visualization.ColumnChart(document.getElementById("img4"));
+        chart.draw(view, options);
+        }
+
+      function drawChart5() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'Total Transfer Size (KB)');
+        data.addColumn('number', 'Total Requests');
+
+        {% for item in total_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'Total Transfer Size & Total Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img5"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart6() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'HTML Transfer Size (KB)');
+        data.addColumn('number', 'Requests Requests');
+
+        {% for item in html_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'HTML Transfer Size & HTML Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img6"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart7() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'JS Transfer Size (KB)');
+        data.addColumn('number', 'JS Requests');
+
+        {% for item in js_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'JS Transfer Size & JS Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img7"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart8() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'CSS Transfer Size (KB)');
+        data.addColumn('number', 'CSS Requests');
+
+        {% for item in css_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'CSS Transfer Size & CSS Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img8"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart9() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'Image Transfer Size (KB)');
+        data.addColumn('number', 'Image Requests');
+
+        {% for item in image_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'Image Transfer Size & Image Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img9"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart10() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'Flash Transfer Size (KB)');
+        data.addColumn('number', 'Flash Requests');
+
+        {% for item in flash_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'Flash Transfer Size & Flash Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img10"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart11() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'Font Transfer Size (KB)');
+        data.addColumn('number', 'Font Requests');
+
+        {% for item in font_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'Font Transfer Size & Font Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img11"));
+
+      chart.draw(data, options);
+
+      }
+
+      function drawChart12() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Day');
+        data.addColumn('number', 'Other Transfer Size (KB)');
+        data.addColumn('number', 'Other Requests');
+
+        {% for item in other_transfer %}
+            data.addRow([new Date({{ item.0 }}), {{ item.1 }}, {{ item.2 }}]);
+        {% endfor %}
+        var options = {
+        chart: {
+          title: 'Trends',
+          subtitle: 'Other Transfer Size & Other Requests'
+        },
+        width: 800,
+        height: 400
+      };
+
+      var chart = new google.charts.Line(document.getElementById("img12"));
+
+      chart.draw(data, options);
+
+      }
+
+    </script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/index/">HTTP Archive for Mobile</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Home</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <h1>{{app_name}}</h1>
+                <li class="active"><a href="#status">Status <span class="sr-only">(current)</span></a></li>
+                <li><a href="#img1">Average Bytes per Page by Content Type</a></li>
+                <li><a href="#img2">Average Individual Response Size</a></li>
+                <li><a href="#img3">Image Requests by Format</a></li>
+                <li><a href="#img4">Cache Life Time</a></li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li class="active"><a href="#trends">Trends <span class="sr-only">(current)</span></a></li>
+                <li><a href="#img5">Total Transfer Size & Total Requests</a></li>
+                <li><a href="#img6">HTML Transfer Size & HTML Requests</a></li>
+                <li><a href="#img7">JS Transfer Size & JS Requests</a></li>
+                <li><a href="#img8">CSS Transfer Size & CSS Requests</a></li>
+                <li><a href="#img9">Image Transfer Size & Image Requests</a></li>
+                <li><a href="#img10">Flash Transfer Size & Flash Requests</a></li>
+                <li><a href="#img11">Font Transfer Size & Font Requests</a></li>
+                <li><a href="#img12">Other Transfer Size & Other Requests</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header" id="status">Status</h1>
+            <div class="row medium-8 large-7 columns">
+                <table>
+                    <tr>
+                        <td><div id="img1" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img2" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td><div id="img3" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img4" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td><div id="img5" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img6" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td><div id="img7" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img8" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td><div id="img9" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img10" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td><div id="img11" style="width: 450px; height: 500px;"></div></td>
+                        <td><div id="img12" style="width: 450px; height: 500px;"></div></td>
+                    </tr>
+                </table>
+
+
+                <h1 class="page-header" id="trends">Trends</h1>
+            </div>
+            <div class="row placeholders">
+                <div class="col-xs-6 col-sm-3 placeholder">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                         width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                    <h4>Label</h4>
+                    <span class="text-muted">Something else</span>
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                         width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                    <h4>Label</h4>
+                    <span class="text-muted">Something else</span>
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                         width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                    <h4>Label</h4>
+                    <span class="text-muted">Something else</span>
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                         width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                    <h4>Label</h4>
+                    <span class="text-muted">Something else</span>
+                </div>
+            </div>
+
+            <h2 class="sub-header">Section title</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1,001</td>
+                        <td>Lorem</td>
+                        <td>ipsum</td>
+                        <td>dolor</td>
+                        <td>sit</td>
+                    </tr>
+                    <tr>
+                        <td>1,002</td>
+                        <td>amet</td>
+                        <td>consectetur</td>
+                        <td>adipiscing</td>
+                        <td>elit</td>
+                    </tr>
+                    <tr>
+                        <td>1,003</td>
+                        <td>Integer</td>
+                        <td>nec</td>
+                        <td>odio</td>
+                        <td>Praesent</td>
+                    </tr>
+                    <tr>
+                        <td>1,003</td>
+                        <td>libero</td>
+                        <td>Sed</td>
+                        <td>cursus</td>
+                        <td>ante</td>
+                    </tr>
+                    <tr>
+                        <td>1,004</td>
+                        <td>dapibus</td>
+                        <td>diam</td>
+                        <td>Sed</td>
+                        <td>nisi</td>
+                    </tr>
+                    <tr>
+                        <td>1,005</td>
+                        <td>Nulla</td>
+                        <td>quis</td>
+                        <td>sem</td>
+                        <td>at</td>
+                    </tr>
+                    <tr>
+                        <td>1,006</td>
+                        <td>nibh</td>
+                        <td>elementum</td>
+                        <td>imperdiet</td>
+                        <td>Duis</td>
+                    </tr>
+                    <tr>
+                        <td>1,007</td>
+                        <td>sagittis</td>
+                        <td>ipsum</td>
+                        <td>Praesent</td>
+                        <td>mauris</td>
+                    </tr>
+                    <tr>
+                        <td>1,008</td>
+                        <td>Fusce</td>
+                        <td>nec</td>
+                        <td>tellus</td>
+                        <td>sed</td>
+                    </tr>
+                    <tr>
+                        <td>1,009</td>
+                        <td>augue</td>
+                        <td>semper</td>
+                        <td>porta</td>
+                        <td>Mauris</td>
+                    </tr>
+                    <tr>
+                        <td>1,010</td>
+                        <td>massa</td>
+                        <td>Vestibulum</td>
+                        <td>lacinia</td>
+                        <td>arcu</td>
+                    </tr>
+                    <tr>
+                        <td>1,011</td>
+                        <td>eget</td>
+                        <td>nulla</td>
+                        <td>Class</td>
+                        <td>aptent</td>
+                    </tr>
+                    <tr>
+                        <td>1,012</td>
+                        <td>taciti</td>
+                        <td>sociosqu</td>
+                        <td>ad</td>
+                        <td>litora</td>
+                    </tr>
+                    <tr>
+                        <td>1,013</td>
+                        <td>torquent</td>
+                        <td>per</td>
+                        <td>conubia</td>
+                        <td>nostra</td>
+                    </tr>
+                    <tr>
+                        <td>1,014</td>
+                        <td>per</td>
+                        <td>inceptos</td>
+                        <td>himenaeos</td>
+                        <td>Curabitur</td>
+                    </tr>
+                    <tr>
+                        <td>1,015</td>
+                        <td>sodales</td>
+                        <td>ligula</td>
+                        <td>in</td>
+                        <td>libero</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../../static/assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="../../static/dist/js/bootstrap.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="../../static/assets/js/vendor/holder.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../../static/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
