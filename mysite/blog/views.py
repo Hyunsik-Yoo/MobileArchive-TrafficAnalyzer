@@ -2,6 +2,7 @@
 
 from django.shortcuts import render, get_object_or_404
 from . import harAnalyzer
+from time import localtime, strftime
 import sqlite3
 from blog.models import Trends
 import socket
@@ -17,11 +18,10 @@ config.read("setting.ini")
 
 db_path = config.get("trafficAnalyzer","db_path")
 har_path = config.get("trafficAnalyzer","har_path")
+pcap_path = config.get("trafficAnalyzer","pcap_path")
 HOST = config.get("trafficAnalyzer","HOST")
 PORT = config.get("trafficAnalyzer","PORT")
 
-#db_path = "/home/dbgustlr92/MobilArchive/appList.db"
-#har_path = "/home/dbgustlr92/MobilArchive/mysite/test.har"
 
 def dashboard(request):
     return render(request, 'blog/dashboard.html')
@@ -48,23 +48,12 @@ def after_selection_app(request):
     return render(request, 'blog/index.html',{"app_name":request.POST['app']})
 
 def run_test(request):
-    # app_name , device_name
     #print(request.POST['app_name'])
 
+    har_name = socket_client(request.POST['app_name'])
 
-    socket_client(request.POST['app_name'])
-    #conn = sqlite3.connect(db_path)
-    #c = conn.cursor()
-    #query = 'SELECT package, apkName FROM list WHERE appName="' + request.POST['app_name'] + '"'
-    #print 'query : ' + query
-    #result = c.execute(query).fetchall()
-    #packageName = result[0][0]
-    #apkName = result[0][1]
-    #conn.close()
 
-    #deviceController.runTest(packageName,apkName)
-
-    harFile = harAnalyzer.readJsonFile(har_path)
+    harFile = harAnalyzer.readJsonFile(har_name)
 
     averageBytesPerPageByContentTypeData = harAnalyzer.averageBytesPerPageByContentTypeData(harFile)
     averageIndividualResponseSizeData = harAnalyzer.averageIndividualResponseSize(harFile)
@@ -86,10 +75,6 @@ def run_test(request):
 
     print(total_transfer)
 
-
-
-
-
     return render(request,'blog/dashboard.html',
                   {"averageBytesPerPageByContentTypeData": averageBytesPerPageByContentTypeData,
                    "averageIndividualResponseSize": averageIndividualResponseSizeData,
@@ -100,8 +85,6 @@ def run_test(request):
 
 
 def socket_client(app_name):
-    #HOST = '168.188.129.206'
-    #PORT = 8080
 
     s = socket.socket()
     s.connect((HOST, int(PORT)))
@@ -112,7 +95,6 @@ def socket_client(app_name):
     c = conn.cursor()
 
     query = 'SELECT apkName,package FROM list WHERE appName="' + app_name + '"'
-    # print ('query : ' + query)
     apk_name = c.execute(query).fetchall()[0][0]
     pkg_name = c.execute(query).fetchall()[0][1]
 
@@ -128,10 +110,12 @@ def socket_client(app_name):
     print('apk_name was sended')
     conn.close()
 
+
+    #har 파일 수신
     print('write har file')
-    f = open(har_path, 'wb')
+    har_name = har_path + strftime("%Y%m%d%H%M%S",localtime()) + app_name + '.har'
+    f = open(har_name , 'wb')
     data = s.recv(1024)
-    print(data)
 
     while (data):
         if data[len(data) - 8:] == 'finished':
@@ -141,9 +125,27 @@ def socket_client(app_name):
         else:
             f.write(data)
             data = s.recv(1024)
-            print(data)
     f.close()
-    print 'finished transfer'
+    print('finished transfer')
+    
+
+    #pcap 파일 수신
+    print('write pcap file')
+    f = open(pcap_path + strftime("%Y%m%d%H%M%S",localtime()) + app_name + '.pcap', 'wb')
+    data = s.recv(1024)
+    while (data):
+       if data[len(data) - 8:] == 'finished':
+           data = data[:-8]
+           f.write(data)
+           break
+       else:
+           f.write(data)
+           data = s.recv(1024)
+           print(data)
+    f.close()
+    print('finished transfer') 
+    
     s.close()
+    return har_name
 
 
