@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 import json
 import numpy
 import datetime
@@ -84,8 +85,26 @@ def insertTrends(name,js):
 
     return True
 
+def water_fall(js):
+    result = []
+    firstTime = js['log']['entries'][0]['startedDateTime']
+    firstTime = datetime.datetime.strptime(firstTime,'%Y-%m-%dT%H:%M:%S.%fZ')
 
+    for entry in js['log']['entries']:
+        startedDateTime = entry['startedDateTime']
+        endedDateTime = entry['endedDateTime']
 
+        start = datetime.datetime.strptime(startedDateTime, '%Y-%m-%dT%H:%M:%S.%fZ')
+        end = datetime.datetime.strptime(endedDateTime, '%Y-%m-%dT%H:%M:%S.%fZ')
+
+        relTime = start - firstTime
+        totalTime = int(entry['time']) * 0.001 #ms이므로 다시 초로 환산
+
+        url = entry['request']['url']
+        result.append([str(url), relTime.total_seconds(), relTime.total_seconds(), 
+            relTime.total_seconds() + totalTime, relTime.total_seconds() + totalTime])
+
+    return result
 
 
 def averageBytesPerPageByContentTypeData(js):
@@ -381,3 +400,7 @@ def other_transfer(objects):
         result.append([float(item.date), int(item.other_transfer_size / 1024), int(item.other_requests)])
 
     return result
+
+
+    
+

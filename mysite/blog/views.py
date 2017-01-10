@@ -59,6 +59,7 @@ def run_test(request):
     averageIndividualResponseSizeData = harAnalyzer.averageIndividualResponseSize(harFile)
     imageRequeestsByFormatData = harAnalyzer.imageRequestsByFormat(harFile)
     cacheLifetimeData = harAnalyzer.cacheLifetime(harFile)
+    waterfall = harAnalyzer.water_fall(harFile)
     harAnalyzer.insertTrends(request.POST['app_name'], harFile)
 
     items = Trends.objects.filter(app_name =request.POST['app_name'])
@@ -78,10 +79,33 @@ def run_test(request):
     return render(request,'blog/dashboard.html',
                   {"averageBytesPerPageByContentTypeData": averageBytesPerPageByContentTypeData,
                    "averageIndividualResponseSize": averageIndividualResponseSizeData,
-                   "imageRequestsByFormatData": imageRequeestsByFormatData, "cacheLifetimeData": cacheLifetimeData,
+                   "imageRequestsByFormatData": imageRequeestsByFormatData, "cacheLifetimeData": cacheLifetimeData, "waterfall" : waterfall,
                    "total_transfer": total_transfer, "html_transfer":html_transfer, "css_transfer":css_transfer,
                    "js_transfer":js_transfer, "image_transfer":image_transfer, "flash_transfer":flash_transfer,
                    "font_transfer":font_transfer, "other_transfer":other_transfer, "app_name":request.POST['app_name']})
+
+def run_auto_test(request):
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+
+    c.execute("SELECT appName FROM list;")
+    app_list = c.fetchall()
+    
+    for current_app in app_list:
+        har_name = socket_client(current_app[0])
+        harFile = harAnalyzer.readJsonFile(har_name)
+
+        averageBytesPerPageByContentTypeData = harAnalyzer.averageBytesPerPageByContentTypeData(harFile)
+        averageIndividualResponseSizeData = harAnalyzer.averageIndividualResponseSize(harFile)
+        imageRequeestsByFormatData = harAnalyzer.imageRequestsByFormat(harFile)
+        cacheLifetimeData = harAnalyzer.cacheLifetime(harFile)
+        harAnalyzer.insertTrends(current_app[0], harFile)
+
+        items = Trends.objects.filter(app_name = current_app[0])
+
+        
+
+    return render(request,'blog/index.html')
 
 
 def socket_client(app_name):
@@ -89,7 +113,12 @@ def socket_client(app_name):
     s = socket.socket()
     s.connect((HOST, int(PORT)))
 
-    s.sendall('runTest')
+    s.sendall('runTest') 
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+
+    c.execute("SELECT appName FROM list;")
+    app_list = c.fetchall()
 
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
@@ -113,7 +142,8 @@ def socket_client(app_name):
 
     #har 파일 수신
     print('write har file')
-    har_name = har_path + strftime("%Y%m%d%H%M%S",localtime()) + app_name + '.har'
+    file_name = remove_special_characters(app_name)
+    har_name = har_path + strftime("%Y%m%d%H%M%S",localtime()) + file_name + '.har'
     f = open(har_name , 'wb')
     data = s.recv(1024)
 
@@ -131,7 +161,7 @@ def socket_client(app_name):
 
     #pcap 파일 수신
     print('write pcap file')
-    f = open(pcap_path + strftime("%Y%m%d%H%M%S",localtime()) + app_name + '.pcap', 'wb')
+    f = open(pcap_path + strftime("%Y%m%d%H%M%S",localtime()) + file_name + '.pcap', 'wb')
     data = s.recv(1024)
     while (data):
        if data[len(data) - 8:] == 'finished':
@@ -141,11 +171,30 @@ def socket_client(app_name):
        else:
            f.write(data)
            data = s.recv(1024)
-           print(data)
+           #print(data)
     f.close()
     print('finished transfer') 
     
     s.close()
     return har_name
+
+def remove_special_characters(input_string):
+    input_string = input_string.replace(" ","")
+    input_string = input_string.replace("/","")
+    input_string = input_string.replace("-","")
+    input_string = input_string.replace("(","")
+    input_string = input_string.replace(")","")
+    input_string = input_string.replace("!","")
+    input_string = input_string.replace(":","")
+    input_string = input_string.replace("[","")
+    input_string = input_string.replace("]","")
+    input_string = input_string.replace("&","")
+    input_string = input_string.replace(",","")
+
+    return input_string
+
+
+
+
 
 
