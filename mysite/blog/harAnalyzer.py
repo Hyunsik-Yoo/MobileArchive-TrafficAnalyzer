@@ -86,6 +86,11 @@ def insertTrends(name,js):
     return True
 
 def water_fall(js):
+    # url, html, start time, dns, connect, ssl
+    # html_request, html_response, js_request, js_response
+    # css_request, css_response, image_request, image_response
+    # flash_request, flash_response, font_request, font_response
+    # other_request, other_response
     result = []
     firstTime = js['log']['entries'][0]['startedDateTime']
     firstTime = datetime.datetime.strptime(firstTime,'%Y-%m-%dT%H:%M:%S.%fZ')
@@ -97,12 +102,83 @@ def water_fall(js):
         start = datetime.datetime.strptime(startedDateTime, '%Y-%m-%dT%H:%M:%S.%fZ')
         end = datetime.datetime.strptime(endedDateTime, '%Y-%m-%dT%H:%M:%S.%fZ')
 
-        relTime = start - firstTime
-        totalTime = int(entry['time']) * 0.001 #ms이므로 다시 초로 환산
-
+        startTime = start - firstTime
+        #totalTime = int(entry['time']) * 0.001 #ms이므로 다시 초로 환산
         url = entry['request']['url']
-        result.append([str(url), relTime.total_seconds(), relTime.total_seconds(), 
-            relTime.total_seconds() + totalTime, relTime.total_seconds() + totalTime])
+
+        dns = entry['timings']['dns'] * 0.001
+        connect = entry['timings']['connect'] * 0.001
+        ssl = 0
+        contentType = entry['response']['content']['mimeType']
+        contentType = contentType.split('/')
+
+        if (contentType[0] == "image"):
+            image_request = entry['timings']['wait'] * 0.001
+            image_response = entry['timings']['receive'] * 0.001
+        else:
+            image_request = 0
+            image_response = 0
+
+        if (contentType[1] == "javascript"):
+            js_request = entry['timings']['wait'] * 0.001
+            js_response = entry['timings']['receive'] * 0.001
+        else:
+            js_request = 0
+            js_response = 0
+
+        if (contentType[1] == "html"):
+            html_request = entry['timings']['wait'] * 0.001
+            html_response = entry['timings']['receive'] * 0.001
+        else:
+            html_request = 0
+            html_response = 0
+
+        if (contentType[1] == "css"):
+            css_request = entry['timings']['wait'] * 0.001
+            css_response = entry['timings']['receive'] * 0.001
+        else:
+            css_request = 0
+            css_response = 0
+
+        if (contentType[1] == 'plain'):
+            text_request = entry['timings']['wait'] * 0.001
+            text_response = entry['timings']['receive'] * 0.001
+        else:
+            text_request = 0
+            text_response = 0
+
+        if (contentType[1] == 'xml'):
+            xml_request = entry['timings']['wait'] * 0.001
+            xml_response = entry['timings']['receive'] * 0.001
+        else:
+            xml_request = 0
+            xml_response = 0
+
+        if (contentType[1] == 'octet-stream'):
+            octet_request = entry['timings']['wait'] * 0.001
+            octet_response = entry['timings']['receive'] * 0.001
+        else:
+            octet_request = 0
+            octet_response = 0
+
+        if(contentType[1] == 'json'):
+            json_request = entry['timings']['wait'] * 0.001
+            json_response = entry['timings']['receive'] * 0.001
+        else:
+            json_request = 0
+            json_response = 0
+
+        #TODO : other 어떻게 처리하지?
+        #other_request = entry['timings']['wait']
+        #other_response = entry['timings']['receive']
+
+
+        result.append([str(url), 'hello', startTime.total_seconds(), dns, connect, ssl, html_request, html_response,
+            js_request, js_response, css_request, css_response, image_request, image_response, text_request, text_response,
+            xml_request, xml_response, octet_request, octet_response, json_request, json_response])
+
+        print (str(url), connect)
+
 
     return result
 

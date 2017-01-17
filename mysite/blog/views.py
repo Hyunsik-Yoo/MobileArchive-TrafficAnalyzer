@@ -19,6 +19,7 @@ config.read("setting.ini")
 db_path = config.get("trafficAnalyzer","db_path")
 har_path = config.get("trafficAnalyzer","har_path")
 pcap_path = config.get("trafficAnalyzer","pcap_path")
+mp4_path = config.get("trafficAnalyzer","mp4_path")
 HOST = config.get("trafficAnalyzer","HOST")
 PORT = config.get("trafficAnalyzer","PORT")
 
@@ -51,6 +52,7 @@ def run_test(request):
     #print(request.POST['app_name'])
 
     har_name = socket_client(request.POST['app_name'])
+    #har_name = har_path + '20170111093716네이버NAVER.har'
 
 
     harFile = harAnalyzer.readJsonFile(har_name)
@@ -79,10 +81,11 @@ def run_test(request):
     return render(request,'blog/dashboard.html',
                   {"averageBytesPerPageByContentTypeData": averageBytesPerPageByContentTypeData,
                    "averageIndividualResponseSize": averageIndividualResponseSizeData,
-                   "imageRequestsByFormatData": imageRequeestsByFormatData, "cacheLifetimeData": cacheLifetimeData, "waterfall" : waterfall,
+                   "imageRequestsByFormatData": imageRequeestsByFormatData, "cacheLifetimeData": cacheLifetimeData,
                    "total_transfer": total_transfer, "html_transfer":html_transfer, "css_transfer":css_transfer,
                    "js_transfer":js_transfer, "image_transfer":image_transfer, "flash_transfer":flash_transfer,
-                   "font_transfer":font_transfer, "other_transfer":other_transfer, "app_name":request.POST['app_name']})
+                   "font_transfer":font_transfer, "other_transfer":other_transfer, "app_name":request.POST['app_name'],
+                   "waterfall":waterfall})
 
 def run_auto_test(request):
     conn = sqlite3.connect(db_path)
@@ -174,6 +177,23 @@ def socket_client(app_name):
            #print(data)
     f.close()
     print('finished transfer') 
+
+
+    print('write mp4 file')
+    f = open(mp4_path + strftime("%Y%m%d%H%M%S",localtime()) + file_name + '.mp4', 'wb')
+    data = s.recv(1024)
+    while (data):
+       if data[len(data) - 8:] == 'finished':
+           data = data[:-8]
+           f.write(data)
+           break
+       else:
+           f.write(data)
+           data = s.recv(1024)
+           #print(data)
+    f.close()
+    print('finished transfer')
+
     
     s.close()
     return har_name

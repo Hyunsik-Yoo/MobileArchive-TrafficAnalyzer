@@ -99,21 +99,51 @@
       }
 
       function drawChart13() {
+  
+          data = new google.visualization.DataTable();
+          data.addColumn('string', 'url'); 
+          data.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+          data.addColumn('number', 'start time');
+          data.addColumn('number', 'dns');
+          data.addColumn('number', 'connect');
+          data.addColumn('number', 'ssl');
+          data.addColumn('number', 'html_request');
+          data.addColumn('number', 'html_response');
+          data.addColumn('number', 'js_request');
+          data.addColumn('number', 'js_response');
+          data.addColumn('number', 'css_request');
+          data.addColumn('number', 'css_response');
+          data.addColumn('number', 'image_request');
+          data.addColumn('number', 'image_response');
+          data.addColumn('number', 'text_request');
+          data.addColumn('number', 'text_response');
+          data.addColumn('number', 'xml_request');
+          data.addColumn('number', 'xml_response');
+          data.addColumn('number', 'octet_request');
+          data.addColumn('number', 'octet_response');
+          data.addColumn('number', 'json_request');
+          data.addColumn('number', 'json_response');
+
          {% autoescape off %}
-         var data = google.visualization.arrayToDataTable({{waterfall}}, true);
+         data.addRows({{waterfall}});
          {% endautoescape %}
 
-         var options = {
-          legend: 'none',
-          orientation : 'vertical',
-          bar: { groupWidth: '100%' }, // Remove space between bars.
-          
-          candlestick: {
-            fallingColor: { strokeWidth: 0, fill: '#a52714' }, // red
-            risingColor: { strokeWidth: 0, fill: '#0f9d58' }   // green
-          }
+          var options = {
+            width: 1200,
+            height : 1200,
+            legend: { position: 'top', maxLines: 5 },
+            bar: { groupWidth: '75%' },
+            hAxis: { minValue: 0,},
+            series: [{color: 'transparent'},{color : '#3f979d'}, {color : '#eb8a2f'}, {color : '#bd3cc9'}
+            , {color : '#cddaed'}, {color : '#96bbef'}, {color : '#e9daca'}, {color : '#dcb07e'}
+            , {color : '#ccdbc4'}, {color : '#a9d493'}, {color : '#ded3e7'}, {color : '#b393ce'}
+            , {color : '#a8cdcf'}, {color : '#4bb1b8'}, {color : '#f2c5bf'}, {color : '#e46152'}
+            , {color : '#d4d4d4'}, {color : '#9e9e9e'}, {color : '#444CC7'}, {color : '#0212AB'}],
+            focusTarget: 'category',
+            isStacked: true
           };
-          var chart = new google.visualization.CandlestickChart(document.getElementById('img13'));
+
+          var chart = new google.visualization.BarChart(document.getElementById('img13'));
           chart.draw(data, options);
        }
 
@@ -380,7 +410,7 @@
                         <td><div id="img6" style="width: 450px; height: 500px;"></div></td>
                     </tr>
                     <tr>
-                        <td><div id="img13" style="width: 900px; height: 900px;"></div></td>
+                        <td><div id="img13" style="width: 100px; height: 20000px;"></div></td>
                     </tr>
                     <tr>
                         <td><div id="img7" style="width: 450px; height: 500px;"></div></td>
