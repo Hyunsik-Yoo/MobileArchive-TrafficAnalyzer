@@ -96,6 +96,7 @@ def water_fall(js):
     firstTime = datetime.datetime.strptime(firstTime,'%Y-%m-%dT%H:%M:%S.%fZ')
 
     for entry in js['log']['entries']:
+        tooltip = getTooltip(entry) # tooltip 안에 들어가는 내용을 HTML형태로...
         startedDateTime = entry['startedDateTime']
         endedDateTime = entry['endedDateTime']
 
@@ -173,7 +174,7 @@ def water_fall(js):
         #other_response = entry['timings']['receive']
 
 
-        result.append([str(url), 'hello', startTime.total_seconds(), dns, connect, ssl, html_request, html_response,
+        result.append([str(url), str(tooltip), startTime.total_seconds(), dns, connect, ssl, html_request, html_response,
             js_request, js_response, css_request, css_response, image_request, image_response, text_request, text_response,
             xml_request, xml_response, octet_request, octet_response, json_request, json_response])
 
@@ -181,6 +182,33 @@ def water_fall(js):
 
 
     return result
+
+def getTooltip(entry):
+    """
+    URL:
+    Host: img.naver.net
+    IP: 101.79.247.157
+    Error/Status Code: 200
+    Client Port: 64780
+    Request Start: 1.619 s
+    Time to First Byte: 76 ms
+    Content Download: 131 ms
+    Bytes In (downloaded): 9.4 KB
+    Bytes Out (uploaded): 0.4 KB
+    """
+    result = dict()
+    result['url'] = entry['request']['url']
+    headers = entry['request']['headers']
+
+    for header in headers:
+        if header['name'] == 'host':
+            result['host'] = header['value']
+    result['status'] = entry['response']['status']
+    result['firstbyte'] = int(entry['timings']['connect']) + int(entry['timings']['wait'])
+    result['receive'] = int(entry['timings']['receive'])
+    result['byteIn'] = int(entry['response']['content']['size'])
+
+    return "<p><br>URL: </br>"+str(result['url'])+"</p>" + "<p><br>Host: " + str(result['host']) + "</p>" + "<p><br>Error/Status Code: " + str(result['status']) + "</p>" + "<p><br>Time to First Byte: " + str(result['firstbyte']) + "</p>" + "<p><br>Content Download: " + str(result['receive']) + "</p>"
 
 
 def averageBytesPerPageByContentTypeData(js):

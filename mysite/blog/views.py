@@ -51,9 +51,9 @@ def after_selection_app(request):
 def run_test(request):
     #print(request.POST['app_name'])
 
-    har_name = socket_client(request.POST['app_name'])
+    #har_name = socket_client(request.POST['app_name'])
     #har_name = har_path + '20170111093716네이버NAVER.har'
-
+    har_name = har_path + '20170117164436네이버NAVER.har'
 
     harFile = harAnalyzer.readJsonFile(har_name)
 

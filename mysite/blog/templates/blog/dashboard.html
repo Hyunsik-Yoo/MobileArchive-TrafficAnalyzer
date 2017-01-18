@@ -130,7 +130,7 @@
 
           var options = {
             width: 1200,
-            height : 1200,
+            height : 3000,
             legend: { position: 'top', maxLines: 5 },
             bar: { groupWidth: '75%' },
             hAxis: { minValue: 0,},
@@ -140,7 +140,8 @@
             , {color : '#a8cdcf'}, {color : '#4bb1b8'}, {color : '#f2c5bf'}, {color : '#e46152'}
             , {color : '#d4d4d4'}, {color : '#9e9e9e'}, {color : '#444CC7'}, {color : '#0212AB'}],
             focusTarget: 'category',
-            isStacked: true
+            isStacked: true,
+            tooltip: { isHtml: true }
           };
 
           var chart = new google.visualization.BarChart(document.getElementById('img13'));
